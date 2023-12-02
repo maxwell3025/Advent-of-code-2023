@@ -1,14 +1,8 @@
 import * as fs from "node:fs/promises";
 const fileData = (await fs.readFile("./input")).toString();
 const dataList = fileData.trim().split('\n');
-const goal: Record<string, number> = {
-	"red": 12,
-	"green": 13,
-	"blue": 14,
-}
 let sum = 0;
-dataList.forEach((line, id) => {
-	console.log(id + 1);
+dataList.forEach(line => {
 	line = line.replace(/^Game \d+: /, "");
 	const events = line
 		.split("; ")
@@ -17,17 +11,24 @@ dataList.forEach((line, id) => {
 				.map(token =>
 					token.split(' ')
 				)
-				.map(([a, b]) => [b, a])
+				.map(([a, b]) => [b, 1*a])
 		)
 		.map(Object.fromEntries);
-	if(events.every(rec => 
-		((rec.red??0) <= goal.red) &&
-		((rec.green??0) <= goal.green) &&
-		((rec.blue??0) <= goal.blue)
-	)){
-		sum += id + 1;
+	const minSet = {
+		red: 0,
+		green: 0,
+		blue: 0
 	}
+	events.forEach(({red, green, blue}) => {
+		minSet.red = Math.max(minSet.red, red??0);
+		minSet.green = Math.max(minSet.green, green??0);
+		minSet.blue = Math.max(minSet.blue, blue??0);
+	});
+	console.log(line);
 	console.log(events);
+	console.log(minSet);
+	console.log(minSet.red * minSet.green * minSet.blue);
+	console.log(sum += minSet.red * minSet.green * minSet.blue);
 });
 console.log(sum)
 

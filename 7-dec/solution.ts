@@ -17,7 +17,7 @@ const rankMap = {
   "8": 8,
   "9": 9,
   "T": 10,
-  "J": 11,
+  "J": 1,
   "Q": 12,
   "K": 13,
   "A": 14,
@@ -41,7 +41,7 @@ function compareAlpha(lhs: string, rhs: string): number{
 }
 
 /**
- * Gets a list of unlabeled counts for numbers\
+ * Gets a list of unlabeled counts for nun-joker numbers\
  * ex. "44556" -> [1, 2, 2]
  */
 function getUnlabeledCount(hand: string): number[]{
@@ -51,27 +51,49 @@ function getUnlabeledCount(hand: string): number[]{
     counter[card] ??= 0;
     counter[card]++;
   }
+  delete counter["J"];
   return Object.values(counter);
 }
 
+function getJokerCount(hand: string): number{
+  let count = 0;
+  for(let cardIndex = 0; cardIndex < 5; cardIndex++){
+    if(hand.charAt(cardIndex) === "J") count++;
+  }
+  return count;
+}
+
 function isFiveOfAKind(hand: string): boolean {
-  return getUnlabeledCount(hand).includes(5);
+  return getUnlabeledCount(hand).length <= 1;
 }
 function isFourOfAKind(hand: string): boolean {
-  return getUnlabeledCount(hand).includes(4);
+  return Math.max(...getUnlabeledCount(hand), 0) + getJokerCount(hand) >= 4;
 }
 function isFullHouse(hand: string): boolean {
-  return getUnlabeledCount(hand).includes(2) &&
-    getUnlabeledCount(hand).includes(3);
+  return getUnlabeledCount(hand).length <= 2 && Math.max(...getUnlabeledCount(hand)) <= 3;
 }
 function isThreeOfAKind(hand: string): boolean {
-  return getUnlabeledCount(hand).includes(3);
+  return Math.max(...getUnlabeledCount(hand), 0) + getJokerCount(hand) >= 3;
 }
 function isTwoPair(hand: string): boolean {
-  return getUnlabeledCount(hand).filter(x => x == 2).length == 2;
+  switch(getJokerCount(hand)){
+    case 0: {
+      return getUnlabeledCount(hand).filter(x => x == 2).length === 2;
+    }
+    case 1: {
+      return getUnlabeledCount(hand).filter(x => x == 2).length >= 1;
+    }
+    case 2:
+    case 3:
+    case 4:
+    case 5: {
+      return true;
+    }
+  }
+  throw new Error("Found either more than 5 or less than 0 jokers, which is not possible. Hand was " + hand)
 }
 function isOnePair(hand: string): boolean {
-  return getUnlabeledCount(hand).includes(2);
+  return getJokerCount(hand) !== 0 || getUnlabeledCount(hand).find(x => x >= 2) !== undefined;
 }
 function isHighCard(hand: string): boolean {
   return getUnlabeledCount(hand).every(x => x == 1);

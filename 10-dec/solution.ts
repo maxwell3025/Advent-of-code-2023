@@ -111,4 +111,17 @@ for (const startingDirection of ["north", "south", "east", "west"] as Direction[
   if(position.x === startX && position.y === startY) break;
   trail.splice(0)
 }
-console.log(trail.length / 2)
+
+trail.push(trail[0])
+
+let area = 0;
+for(let i = 0; i < trail.length - 1; i++){
+  const {x: x1, y: y1} = trail[i];
+  const {x: x2, y: y2} = trail[i + 1];
+  area -= 0.5 * (x1 * y2 - x2 * y1)
+}
+
+area -= (trail.length - 1) * 0.5;
+area += 1;
+
+console.log(area)

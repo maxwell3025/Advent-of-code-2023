@@ -5,7 +5,7 @@ const tokens = fileData
   .split("\n")
   .map((line) => line.split(" ").map((x) => parseInt(x)));
 
-function cont(list: number[]){
+function contNeg(list: number[]){
   if(list.every(x => x === 0)){
     return 0;
   }
@@ -13,9 +13,9 @@ function cont(list: number[]){
   for(let i = 0; i < list.length - 1; i++){
     diffs.push(list[i + 1] - list[i])
   }
-  const newDiff = cont(diffs);
-  return list[list.length - 1] + newDiff;
+  const newDiff = contNeg(diffs);
+  return list[0] - newDiff;
 }
 
-const continuations = tokens.map(cont)
+const continuations = tokens.map(contNeg)
 console.log(continuations.reduce((a, b) => a + b))
